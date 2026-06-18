@@ -1,7 +1,11 @@
 name: Android CI
 
 on:
-  workflow_dispatch: # Lệnh này dùng để tạo nút bấm kích hoạt thủ công
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,8 +21,10 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+    - name: Fix Line Endings for gradlew
+      run: |
+        sed -i 's/\r$//' gradlew
+        chmod +x gradlew
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
