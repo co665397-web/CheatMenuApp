@@ -1,0 +1,42 @@
+name: Build APK
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Kiểm tra cấu trúc thư mục
+        run: |
+          echo "=== Danh sách thư mục gốc ==="
+          ls -la
+          echo "=== Kiểm tra app/build.gradle.kts ==="
+          cat app/build.gradle.kts || echo "app/build.gradle.kts KHÔNG TỒN TẠI"
+          echo "=== Kiểm tra build.gradle.kts gốc ==="
+          cat build.gradle.kts || echo "build.gradle.kts gốc KHÔNG TỒN TẠI"
+          echo "=== Kiểm tra settings.gradle.kts ==="
+          cat settings.gradle.kts || echo "settings.gradle.kts KHÔNG TỒN TẠI"
+
+      - name: Cài Gradle
+        run: |
+          sudo apt update
+          sudo apt install gradle -y
+
+      - name: Build APK
+        run: |
+          gradle assembleDebug --info --stacktrace
+
+      - name: Kiểm tra APK
+        run: |
+          echo "=== Kiểm tra APK ==="
+          ls -la app/build/outputs/apk/debug/ || echo "APK KHÔNG ĐƯỢC TẠO"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
