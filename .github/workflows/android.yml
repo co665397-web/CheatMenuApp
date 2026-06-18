@@ -22,16 +22,16 @@ jobs:
 
     - name: Fix Line Endings for gradlew
       run: |
-        sed -i 's/\r$//' ./CheatMenuApp/gradlew
-        chmod +x ./CheatMenuApp/gradlew
+        sed -i 's/\r$//' gradlew
+        chmod +x gradlew
 
     - name: Build with Gradle
-      run: |
-        cd CheatMenuApp
-        ./gradlew assembleDebug
+      run: ./gradlew assembleDebug --stacktrace
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: my-app-apk
-        path: CheatMenuApp/app/build/outputs/apk/debug/*.apk
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          **/build/outputs/apk/**/*.apk
