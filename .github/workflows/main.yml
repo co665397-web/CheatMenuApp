@@ -12,11 +12,13 @@ jobs:
       - name: Setup Android SDK
         run: |
           sudo apt update
-          sudo apt install android-sdk -y
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip
+          sudo mkdir -p /usr/lib/android-sdk/cmdline-tools
+          sudo mv cmdline-tools /usr/lib/android-sdk/
           echo "sdk.dir=/usr/lib/android-sdk" > local.properties
       - name: Accept licenses
-        run: |
-          yes | sudo /usr/lib/android-sdk/tools/bin/sdkmanager --licenses || true
+        run: yes | sudo /usr/lib/android-sdk/cmdline-tools/bin/sdkmanager --licenses || true
       - name: Build APK
         run: |
           chmod +x gradlew
