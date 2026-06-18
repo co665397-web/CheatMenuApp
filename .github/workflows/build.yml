@@ -5,14 +5,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build APK
+
+      - name: Kiểm tra cấu trúc thư mục
+        run: |
+          echo "=== Danh sách thư mục gốc ==="
+          ls -la
+          echo "=== Kiểm tra gradle/wrapper ==="
+          ls -la gradle/wrapper/ || echo "gradle/wrapper không tồn tại"
+          echo "=== Kiểm tra app/src/main ==="
+          ls -la app/src/main/ || echo "app/src/main không tồn tại"
+
+      - name: Tạo gradle-wrapper.jar nếu thiếu
+        run: |
+          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "gradle-wrapper.jar không tồn tại, đang tải..."
+            mkdir -p gradle/wrapper
+            curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.0.0/gradle/wrapper/gradle-wrapper.jar
+          else
+            echo "gradle-wrapper.jar đã tồn tại"
+          fi
+
+      - name: Cấp quyền và Build APK
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          echo "=== Bắt đầu build ==="
+          ./gradlew assembleDebug --info --stacktrace --no-daemon
+          echo "=== Kết thúc build ==="
+
+      - name: Kiểm tra file APK sau build
+        run: |
+          echo "=== Kiểm tra APK ==="
+          ls -la app/build/outputs/apk/debug/ || echo "APK không được tạo"
+
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
